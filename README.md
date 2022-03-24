@@ -1,26 +1,75 @@
-# HX711 for Raspbery Py
-----
-Quick code credited to [underdoeg](https://github.com/underdoeg/)'s [Gist HX711.py](https://gist.github.com/underdoeg/98a38b54f889fce2b237).
-I've only made a few modifications on the way the captured bits are processed and to support Two's Complement, which it didn't.
+# HX711 for Jetson Nano (libgpiod)
 
-Update: 25/02/2021
-----
-For the past years I haven't been able to maintain this library because I had too much workload. Now I'm back and I've been working on a few fixes and modifications to simplify this library, and I might be commiting the branch by mid-March. I will also publish it to PIP.
+This library is expanding from [HX711 for Rasberry Pi](https://github.com/tatobari/hx711py) using [libgpiod]https://github.com/brgl/libgpiod).
 
-Instructions
-------------
+## Motivation for libgpiod on Jetson Nano
+
+HX711 has a sevior timing requirement while reading data from DOUT. We have only 50us between 1 and 0 of PD_SCK pulse. Original hx711py library uses legacy/slow `/sys/class/gpio` interface in RPi.GPIO so that Jetson Nano violates 50us timing.
+
+libgpiod is the solution using GPIO character device interface, it's faster than /sys/class/gpio interface. Let's use it!
+
+
+## Instructions
+
 Check example.py to see how it works.
 
-Installation
-------------
+## Prerequirements
+
+### libgpiod
+
+You need to install libgpiod <=v1.6.x because newer version (v2.0) requires Linux kernel 5.5, but Jetson Nano's kernel version is 4.9.
+
+```
+sudo apt install autoconf-archive
+git clone git://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git
+cd libgpiod
+git checkout v1.6.3 -b v1.6.3
+./autogen.sh --enable-tools=yes --prefix=/usr/local --enable-bindings-python
+make
+sudo make install
+```
+
+You have to configure something to process libgpiod in user space.
+
+
+1. Add `/usr/local/lib` line to `/etc/ld.so.conf.d/libgpiod.conf`
+2. Rebuild `/etc/ld.so.cache` as the below.
+
+```
+sudo ldconfig
+```
+
+3. Add the line to `/etc/udev/rules.d/99-gpio.rules` as same as RPi.GPIO setting as the below.
+
+```
+SUBSYSTEM=="gpio", KERNEL=="gpiochip*", GROUP="gpio", MODE="0660"
+```
+
+4. Reload udev.
+
+```
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
+
+5. Confirm the group permission for gpiochips.
+
+```
+$ ll /dev/gpio*
+crw-rw---- 1 root gpio 254, 0  Mar 24 15:53 /dev/gpiochip0
+crw-rw---- 1 root gpio 254, 1  Mar 24 15:53 /dev/gpiochip1
+```
+
+
+## Installation for Jetson Nano
+
 1. Clone or download and unpack this repository
 2. In the repository directory, run
 ```
 python setup.py install
 ```
 
-Using a 2-channel HX711 module
-------------------------------
+## Using a 2-channel HX711 module
+
 Channel A has selectable gain of 128 or 64.  Using set_gain(128) or set_gain(64)
 selects channel A with the specified gain.
 
