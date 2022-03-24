@@ -1,5 +1,3 @@
-#! /usr/bin/python2
-
 import time
 import sys
 
@@ -8,21 +6,26 @@ EMULATE_HX711=False
 referenceUnit = 1
 
 if not EMULATE_HX711:
-    import RPi.GPIO as GPIO
+    import gpiod
     from hx711 import HX711
 else:
     from emulated_hx711 import HX711
+
+chip = None
 
 def cleanAndExit():
     print("Cleaning...")
 
     if not EMULATE_HX711:
-        GPIO.cleanup()
+        chip.close()
         
     print("Bye!")
     sys.exit()
 
-hx = HX711(5, 6)
+if not EMULATE_HX711:
+    chip = gpiod.Chip("0", gpiod.Chip.OPEN_BY_NUMBER)
+
+hx = HX711(dout = 11, pd_sck = 7, chip = chip)
 
 # I've found out that, for some reason, the order of the bytes is not always the same between versions of python, numpy and the hx711 itself.
 # Still need to figure out why does it change.
