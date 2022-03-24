@@ -1,6 +1,6 @@
 # HX711 for Jetson Nano (libgpiod)
 
-This library is expanding from [HX711 for Rasberry Pi](https://github.com/tatobari/hx711py) using [libgpiod](https://github.com/brgl/libgpiod) instead of RPi.GPIO.
+This library is based on [HX711 for Rasberry Pi](https://github.com/tatobari/hx711py) using [libgpiod](https://github.com/brgl/libgpiod) instead of RPi.GPIO.
 
 ## Motivation for libgpiod on Jetson Nano
 
