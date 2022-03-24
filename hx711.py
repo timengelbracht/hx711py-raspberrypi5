@@ -39,6 +39,7 @@ DEFAULT_GPIOD_CONSUMER='hx711'
 
 class HX711:
 
+     
     def get_line_no(self, pin_no:int) -> int:
         if not pin_no in self.line_map:
             raise RuntimeError(f"pin:{pin_no} is not found in line map.")
@@ -96,9 +97,11 @@ class HX711:
     def convertFromTwosComplement24bit(self, inputValue) -> int:
         return -(inputValue & 0x800000) + (inputValue & 0x7fffff)
     
+
     def is_ready(self) -> bool:
         return self.DOUT.get_value() == 0
     
+     
     def set_gain(self, gain):
         if gain == 128:
             self.GAIN = 1
@@ -111,7 +114,8 @@ class HX711:
 
         # Read out a set of raw bytes and throw it away.
         self.readRawBytes()
-        
+     
+     
     def get_gain(self) -> int:
         if self.GAIN == 1:
             return 128
@@ -122,7 +126,8 @@ class HX711:
 
         # Shouldn't get here.
         return 0
-        
+     
+     
     def readNextBit(self) -> int:
        # Clock HX711 Digital Serial Clock (PD_SCK).  DOUT will be
        # ready 1us after PD_SCK rising edge, so we sample after
@@ -130,6 +135,7 @@ class HX711:
        self.PD_SCK.set_value(1)
        self.PD_SCK.set_value(0)
        return self.DOUT.get_value()
+
 
     def readNextByte(self) -> int:
        byteValue:int = 0
@@ -146,7 +152,8 @@ class HX711:
 
        # Return the packed byte.
        return byteValue 
-        
+
+     
     def readRawBytes(self) -> list[int]:
         if self.mutex_flag:
             # Wait for and get the Read Lock, incase another thread is already
@@ -180,6 +187,7 @@ class HX711:
         else:
            return [firstByte, secondByte, thirdByte]
 
+          
     def read_long(self) -> int:
         # Get a sample from the HX711 in the form of raw bytes.
         dataBytes:list[int] = self.readRawBytes()
@@ -203,6 +211,7 @@ class HX711:
         # Return the sample value we've read from the HX711.
         return int(signedIntValue)
     
+
     def read_average(self, times:int = 3) -> float:
         # Make sure we've been asked to take a rational amount of samples.
         if times <= 0:
@@ -235,6 +244,7 @@ class HX711:
         # Return the mean of remaining samples.
         return sum(valueList) / len(valueList)
 
+     
     # A median-based read method, might help when getting random value spikes
     # for unknown or CPU-related reasons
     def read_median(self, times:int = 3) -> float:
@@ -261,12 +271,15 @@ class HX711:
           midpoint:int = len(valueList) / 2
           return sum(valueList[midpoint:midpoint+2]) / 2.0
 
+     
     # Compatibility function, uses channel A version
     def get_value(self, times:int = 3) -> float:
         return self.get_value_A(times)
 
+
     def get_value_A(self, times:int = 3) -> float:
         return self.read_median(times) - self.get_offset_A()
+
 
     def get_value_B(self, times:int = 3) -> float:
         # for channel B, we need to set_gain(32)
@@ -276,6 +289,7 @@ class HX711:
         self.set_gain(g)
         return value
 
+     
     # Compatibility function, uses channel A version
     def get_weight(self, times:int = 3) -> float:
         return self.get_weight_A(times)
@@ -286,11 +300,13 @@ class HX711:
         value = value / self.REFERENCE_UNIT
         return value
 
+     
     def get_weight_B(self, times:int = 3) -> float:
         value:float = self.get_value_B(times)
         value = value / self.REFERENCE_UNIT_B
         return value
     
+
     # Sets tare for channel A for compatibility purposes
     def tare(self, times:int = 15) -> float:
         return self.tare_A(times)
