@@ -4,37 +4,38 @@ import threading
 from logzero import logger
 
 # from https://developer.nvidia.com/embedded/learn/jetson-nano-2gb-devkit-user-guide
-LINE_MAP_JETSON_NANO:dict[int, str] = {
-     3: 'J3',
-     5: 'J2',
-     7: 'BB0',
-     8: 'G0',
-    10: 'G1',
-    11: 'G2',
-    12: 'J7',
-    13: 'B6',
-    15: 'Y2',
-    16: 'DD0',
-    18: 'B7',
-    19: 'C0',
-    21: 'C1',
-    22: 'B5', # same as #27 # default:GPIO alt:SPI1_MISO
-    23: 'C2', # same as #28 # default:GPIO alt:SPI0_SCK
-    24: 'C3',
-    26: 'C4',
-    27: 'B5', # same as #22 # default:I2C0_SDA alt:GPIO
-    28: 'C2', # same as #23 # default:I2C0_CLK alt:GPIO
-    29: 'S5',
-    31: 'Z0',
-    32: 'V0',
-    33: 'E6',
-    35: 'J4',
-    36: 'G3',
-    37: 'B4',
-    38: 'J5',
-    40: 'J6'
+DEFAULT_LINE_MAP: dict[str, dict] = {
+    'JETSON_NANO' : {
+         3: 'J3',
+         5: 'J2',
+         7: 'BB0',
+         8: 'G0',
+        10: 'G1',
+        11: 'G2',
+        12: 'J7',
+        13: 'B6',
+        15: 'Y2',
+        16: 'DD0',
+        18: 'B7',
+        19: 'C0',
+        21: 'C1',
+        22: 'B5', # same as #27 # default:GPIO alt:SPI1_MISO
+        23: 'C2', # same as #28 # default:GPIO alt:SPI0_SCK
+        24: 'C3',
+        26: 'C4',
+        27: 'B5', # same as #22 # default:I2C0_SDA alt:GPIO
+        28: 'C2', # same as #23 # default:I2C0_CLK alt:GPIO
+        29: 'S5',
+        31: 'Z0',
+        32: 'V0',
+        33: 'E6',
+        35: 'J4',
+        36: 'G3',
+        37: 'B4',
+        38: 'J5',
+        40: 'J6'
+    }
 }
-
 DEFAULT_GPIOD_CONSUMER='hx711'
 
 class HX711:
@@ -52,8 +53,15 @@ class HX711:
         return address_num * 8 + offset
 
 
-    def __init__(self, dout:int, pd_sck:int, gain:int = 128, mutex:bool = False, chip = None, line_map:dict[int, str] = LINE_MAP_JETSON_NANO):
-        self.line_map:dict[int, str] = line_map
+    def __init__(self, dout:int, pd_sck:int, gain:int = 128, mutex:bool = False, chip = None, line_map_name:str = 'JETSON_NANO', custome_line_map:dict = None):
+        self.line_map = None
+        if line_map_name in DEFAULT_LINE_MAP:
+            self.line_map = DEFAULT_LINE_MAP[line_map_name]
+        elif custome_line_map:
+            self.line_map:dict[int, str] = custome_line_map
+        else:
+            raise RuntimeError(f"line_map_name={line_map_name} is not found. You can also specify custome_line_map for your device.")
+
         self.chip = chip
         if self.chip is None:
             self.chip = gpiod.Chip("0", gpiod.Chip.OPEN_BY_NUMBER)
