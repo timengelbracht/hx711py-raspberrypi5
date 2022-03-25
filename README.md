@@ -1,10 +1,10 @@
 # HX711 for Jetson Nano (libgpiod)
 
-This library is expanding from [HX711 for Rasberry Pi](https://github.com/tatobari/hx711py) using [libgpiod](https://github.com/brgl/libgpiod) instead of RPi.GPIO.
+This library is based on [HX711 for Rasberry Pi](https://github.com/tatobari/hx711py) using [libgpiod](https://github.com/brgl/libgpiod) instead of RPi.GPIO.
 
 ## Motivation for libgpiod on Jetson Nano
 
-HX711 has a sevior timing requirement while reading data from DOUT. We have only 50us between 1 and 0 of PD_SCK pulse. Original hx711py library uses legacy/slow `/sys/class/gpio` interface in RPi.GPIO so that Jetson Nano violates 50us timing.
+HX711 has a sevior timing requirement while reading data from DOUT. We have only 50us between 1 and 0 of PD_SCK pulse. Original hx711py library uses legacy/slow `/sys/class/gpio` interface with RPi.GPIO so that Jetson Nano violates 50us timing.
 
 libgpiod is the solution using GPIO character device interface, it's faster than /sys/class/gpio interface. Let's use it!
 
