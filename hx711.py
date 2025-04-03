@@ -5,34 +5,11 @@ from logzero import logger
 from typing import Dict, List
 
 # from https://pinout.xyz
+# from https://pinout.xyz
 DEFAULT_LINE_MAP: Dict[str, Dict[int, str]] = {
     'RPI_5': {
-        3:  'GPIO2',    # SDA1
-        5:  'GPIO3',    # SCL1
-        7:  'GPIO4',
-        8:  'GPIO14',   # TXD
-        10: 'GPIO15',   # RXD
-        11: 'GPIO17',
-        12: 'GPIO18',
-        13: 'GPIO27',
-        15: 'GPIO22',
-        16: 'GPIO23',
-        18: 'GPIO24',
-        19: 'GPIO10',   # MOSI
-        21: 'GPIO9',    # MISO
-        22: 'GPIO25',
-        23: 'GPIO11',   # SCLK
-        24: 'GPIO8',    # CE0
-        26: 'GPIO7',    # CE1
-        29: 'GPIO5',
-        31: 'GPIO6',
-        32: 'GPIO12',
-        33: 'GPIO13',
-        35: 'GPIO19',
-        36: 'GPIO16',
-        37: 'GPIO26',
-        38: 'GPIO20',
-        40: 'GPIO21',
+        29: 5,
+        31: 6,
     }
 }
 DEFAULT_GPIOD_CONSUMER = 'hx711'
@@ -41,20 +18,14 @@ class HX711:
     def get_line_no(self, pin_no: int) -> int:
         if pin_no not in self.line_map:
             raise RuntimeError(f"pin:{pin_no} is not found in line map.")
-        line_str: str = self.line_map[pin_no]
-        offset: int = int(line_str[-1])
-        address: str = line_str[:-1]
-        address_num: int = ord(address[0]) - ord('A')
-        if len(address) == 2:
-            address_num += ord('Z') - ord('A') + 1
-        return address_num * 8 + offset
+        return self.line_map[pin_no]
 
     def __init__(self, dout: int, pd_sck: int, gain: int = 128, mutex: bool = False, chip=None, line_map_name: str = 'RPI_5', custome_line_map: Dict[int, str] = None):
         self.line_map = DEFAULT_LINE_MAP.get(line_map_name, custome_line_map)
         if not self.line_map:
             raise RuntimeError(f"line_map_name={line_map_name} is not found. You can also specify custome_line_map for your device.")
 
-        self.chip = chip or gpiod.Chip("0", gpiod.Chip.OPEN_BY_NUMBER)
+        self.chip = chip or gpiod.Chip("4", gpiod.Chip.OPEN_BY_NUMBER)
         self.PD_SCK = self.chip.get_line(self.get_line_no(pd_sck))
         self.DOUT = self.chip.get_line(self.get_line_no(dout))
         self.mutex_flag = mutex
