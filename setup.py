@@ -1,9 +1,14 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
-    name='hx711',
-    version='0.1',
-    description='HX711 Python Library for Jetson Nano',
-    py_modules=['hx711'],
-    install_requires=['logzero']
+    name='hx711py_rpi5',
+    version='0.1.0',
+    description='HX711 driver for Raspberry Pi 5 using gpiod',
+    author='Your Name',
+    packages=find_packages(),
+    install_requires=[
+        'gpiod',
+        'logzero'
+    ],
+    python_requires='>=3.7',
 )
