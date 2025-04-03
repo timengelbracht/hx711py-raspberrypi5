@@ -4,16 +4,20 @@ This library is based on [HX711 for Rasberry Pi](https://github.com/tatobari/hx7
 
 ## Motivation for libgpiod on RPi5
 
-Works for reading hx711 on rpi. Not well tested and files like emulated_hx711.py and example.py are from the jetson nano branch i adapted, so just ignore them. I just made this cuz for some reason all hx711 libs dont work for rpi5. Everything bleow this block of text ist from the jetson nano fork.
+Works for reading hx711 on rpi. Not well tested and files like emulated_hx711.py and example.py are from the jetson nano branch i adapted, so just ignore them. I just made this cuz for some reason all hx711 libs dont work for rpi5. 
 
 
 ## Instructions
 
-Check example.py to see how it works.
+Check test_example.py to see how it works.
 
-## Prerequirements
+### Requirements
+```
+sudo apt install -y python3-libgpiod
+pip3 install logzero
+```
 
-### libgpiod
+### Everything bleow this block of text ist from the jetson nano fork., wasnt necessary for me, might be hlpful for you ;)
 
 You need to install libgpiod <=v1.6.x because newer version (v2.0) requires Linux kernel 5.5, but Jetson Nano's kernel version is 4.9.
 
