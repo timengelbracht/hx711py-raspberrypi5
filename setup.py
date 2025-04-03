@@ -7,7 +7,6 @@ setup(
     author='Your Name',
     packages=find_packages(),
     install_requires=[
-        'gpiod',
         'logzero'
     ],
     python_requires='>=3.7',
